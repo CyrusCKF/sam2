@@ -73,6 +73,7 @@ def setup_distributed_backend(backend, timeout_mins):
     # enable TORCH_NCCL_ASYNC_ERROR_HANDLING to ensure dist nccl ops time out after timeout_mins
     # of waiting
     os.environ["TORCH_NCCL_ASYNC_ERROR_HANDLING"] = "1"
+    os.environ["USE_LIBUV"] = "0" # Disable libuv as not supported in new pytorch https://docs.pytorch.org/tutorials/intermediate/TCPStore_libuv_backend.html#exit-route-3-set-environment-variable-use-libuv-to-0
     logging.info(f"Setting up torch.distributed with a timeout of {timeout_mins} mins")
     dist.init_process_group(backend=backend, timeout=timedelta(minutes=timeout_mins))
     return dist.get_rank()

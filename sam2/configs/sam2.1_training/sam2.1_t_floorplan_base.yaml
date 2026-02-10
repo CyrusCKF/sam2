@@ -9,13 +9,13 @@ scratch:
   base_lr: 5.0e-6
   vision_lr: 3.0e-06
   phases_per_epoch: 1
-  num_epochs: 40
+  num_epochs: 100
 
 dataset:
   # PATHS to Dataset
-  img_folder: D:/_Dataset/MOSE/train/train/JPEGImages # PATH to MOSE JPEGImages folder
-  gt_folder: D:/_Dataset/MOSE/train/train/Annotations  # PATH to MOSE Annotations folder
-  file_list_txt: training/assets/MOSE_sample_train_list.txt # Optional PATH to filelist containing a subset of videos to be used for training
+  img_folder: C:/Users/m1999/_Workspace/Python/construction-helper/backend/private/FloorPlanDataset/JPEGImages # PATH to MOSE JPEGImages folder
+  gt_folder: C:/Users/m1999/_Workspace/Python/construction-helper/backend/private/FloorPlanDataset/Annotations  # PATH to MOSE Annotations folder
+  file_list_txt: null # Optional PATH to filelist containing a subset of videos to be used for training
   multiplier: 2
 
 # Video transforms
@@ -68,9 +68,12 @@ trainer:
       scalp: 1
       trunk:
         _target_: sam2.modeling.backbones.hieradet.Hiera
-        embed_dim: 112
-        num_heads: 2
+        embed_dim: 96
+        num_heads: 1
         drop_path_rate: 0.1
+        stages: [1, 2, 7, 2]
+        global_att_blocks: [5, 7, 9]
+        window_pos_embed_bkg_spatial_size: [7, 7]
       neck:
         _target_: sam2.modeling.backbones.image_encoder.FpnNeck
         position_encoding:
@@ -80,7 +83,7 @@ trainer:
           scale: null
           temperature: 10000
         d_model: 256
-        backbone_channel_list: [896, 448, 224, 112]
+        backbone_channel_list: [768, 384, 192, 96]
         fpn_top_down_levels: [2, 3]  # output level 0 and 1 directly use the backbone features
         fpn_interp_model: nearest
 
@@ -174,7 +177,8 @@ trainer:
     multimask_max_pt_num: 1
     use_mlp_for_obj_ptr_proj: true
     # Compilation flag
-    # compile_image_encoder: False
+    # HieraT does not currently support compilation, should always be set to False
+    compile_image_encoder: False
 
     ####### Training specific params #######
     # box/point input and corrections
@@ -308,7 +312,7 @@ trainer:
   # initialize from a SAM 2 checkpoint
   checkpoint:
     save_dir: ${launcher.experiment_log_dir}/checkpoints
-    save_freq: 0 # 0 only last checkpoint is saved.
+    save_freq: 10 # 0 only last checkpoint is saved.
     model_weight_initializer:
       _partial_: True
       _target_: training.utils.checkpoint_utils.load_state_dict_into_model
@@ -318,7 +322,7 @@ trainer:
 
       state_dict:
         _target_: training.utils.checkpoint_utils.load_checkpoint_and_apply_kernels
-        checkpoint_path: ./checkpoints/sam2.1_hiera_base_plus.pt # PATH to SAM 2.1 checkpoint
+        checkpoint_path: ./checkpoints/sam2.1_hiera_tiny.pt # PATH to SAM 2.1 checkpoint
         ckpt_state_dict_keys: ['model']
 
 launcher:
