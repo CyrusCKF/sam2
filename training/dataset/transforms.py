@@ -34,6 +34,16 @@ def hflip(datapoint, index):
     return datapoint
 
 
+def vflip(datapoint, index):
+
+    datapoint.frames[index].data = F.vflip(datapoint.frames[index].data)
+    for obj in datapoint.frames[index].objects:
+        if obj.segment is not None:
+            obj.segment = F.vflip(obj.segment)
+
+    return datapoint
+
+
 def get_size_with_aspect_ratio(image_size, size, max_size=None):
     w, h = image_size
     if max_size is not None:
@@ -151,6 +161,23 @@ class RandomHorizontalFlip:
         for i in range(len(datapoint.frames)):
             if random.random() < self.p:
                 datapoint = hflip(datapoint, i)
+        return datapoint
+
+
+class RandomVerticalFlip:
+    def __init__(self, consistent_transform, p=0.5):
+        self.p = p
+        self.consistent_transform = consistent_transform
+
+    def __call__(self, datapoint, **kwargs):
+        if self.consistent_transform:
+            if random.random() < self.p:
+                for i in range(len(datapoint.frames)):
+                    datapoint = vflip(datapoint, i)
+            return datapoint
+        for i in range(len(datapoint.frames)):
+            if random.random() < self.p:
+                datapoint = vflip(datapoint, i)
         return datapoint
 
 

@@ -9,9 +9,9 @@
 
 ## Commands
 
-- Train sam in floor\sam2 `python training/train.py -c configs/sam2.1_training/sam2.1_t_floorplan_base.yaml  --use-cluster 0 --num-gpus 1`
+- Train sam in floor\sam2 `python training/train.py -c configs/sam2.1_training/sam2.1_hiera_t_floorplan_finetune.yaml  --use-cluster 0 --num-gpus 1`
   - View tensorboard `tensorboard --bind_all --logdir ./sam2_logs/`
 
 ## Stuff
 
-May modify the hyper parameters in `sam2\sam2\configs\sam2.1_training\sam2.1_t_floorplan_base.yaml`
+May modify the hyper parameters in `sam2\sam2\configs\sam2.1_training\sam2.1_hiera_t_floorplan_finetune.yaml`
