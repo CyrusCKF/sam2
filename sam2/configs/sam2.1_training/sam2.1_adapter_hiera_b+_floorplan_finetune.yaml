@@ -67,6 +67,10 @@ trainer:
 
   model:
     _target_: training.model.sam2.SAM2Train
+    input_adapter:
+      _target_: sam2.modeling.input_adapter.InputAdapter
+      hidden_channels: 8
+      residual_scale: 1.0
     image_encoder:
       _target_: sam2.modeling.backbones.image_encoder.ImageEncoder
       scalp: 1
@@ -255,15 +259,6 @@ trainer:
       max_norm: 0.1
       norm_type: 2
 
-    param_group_modifiers:
-      - _target_: training.optimizer.layer_decay_param_modifier
-        _partial_: True
-        layer_decay_value: 0.9
-        apply_to: 'image_encoder.trunk'
-        overrides:
-          - pattern: '*pos_embed*'
-            value: 1.0
-
     options:
       lr:
         - scheduler:
@@ -323,7 +318,7 @@ trainer:
       _target_: training.utils.checkpoint_utils.load_state_dict_into_model
       strict: True
       ignore_unexpected_keys: null
-      ignore_missing_keys: null
+      ignore_missing_keys: ['input_adapter.*']
 
       state_dict:
         _target_: training.utils.checkpoint_utils.load_checkpoint_and_apply_kernels
@@ -333,7 +328,7 @@ trainer:
 launcher:
   num_nodes: 1
   gpus_per_node: 8
-  experiment_log_dir: sam2_logs/b+-PTT-all_false # Path to log directory, defaults to ./sam2_logs/${config_name}
+  experiment_log_dir: sam2_logs/Ab+-TTT-H8-ReLU # Path to log directory, defaults to ./sam2_logs/${config_name}
 
 # SLURM args if running on a cluster
 submitit:

@@ -26,6 +26,7 @@ class SAM2Train(SAM2Base):
     def __init__(
         self,
         image_encoder,
+        input_adapter=None,
         memory_attention=None,
         memory_encoder=None,
         prob_to_use_pt_input_for_train=0.0,
@@ -65,10 +66,21 @@ class SAM2Train(SAM2Base):
         # whether to forward image features per frame (as it's being tracked) during evaluation, instead of forwarding image features
         # of all frames at once. This avoids backbone OOM errors on very long videos in evaluation, but could be slightly slower.
         forward_backbone_per_frame_for_eval=False,
+        freeze_input_adapter=False,
         freeze_image_encoder=False,
+        freeze_memory_attention=False,
+        freeze_memory_encoder=False,
+        freeze_prompt_encoder=False,
+        freeze_mask_decoder=False,
         **kwargs,
     ):
-        super().__init__(image_encoder, memory_attention, memory_encoder, **kwargs)
+        super().__init__(
+            image_encoder,
+            input_adapter=input_adapter,
+            memory_attention=memory_attention,
+            memory_encoder=memory_encoder,
+            **kwargs,
+        )
         self.use_act_ckpt_iterative_pt_sampling = use_act_ckpt_iterative_pt_sampling
         self.forward_backbone_per_frame_for_eval = forward_backbone_per_frame_for_eval
 
@@ -100,9 +112,23 @@ class SAM2Train(SAM2Base):
         # A random number generator with a fixed initial seed across GPUs
         self.rng = np.random.default_rng(seed=42)
 
+        def _freeze_module(module):
+            if module is not None:
+                for p in module.parameters():
+                    p.requires_grad = False
+
+        if freeze_input_adapter:
+            _freeze_module(self.input_adapter)
         if freeze_image_encoder:
-            for p in self.image_encoder.parameters():
-                p.requires_grad = False
+            _freeze_module(self.image_encoder)
+        if freeze_memory_attention:
+            _freeze_module(self.memory_attention)
+        if freeze_memory_encoder:
+            _freeze_module(self.memory_encoder)
+        if freeze_prompt_encoder:
+            _freeze_module(self.sam_prompt_encoder)
+        if freeze_mask_decoder:
+            _freeze_module(self.sam_mask_decoder)
 
     def forward(self, input: BatchedVideoDatapoint):
         if self.training or not self.forward_backbone_per_frame_for_eval:
