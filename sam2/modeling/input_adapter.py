@@ -14,10 +14,10 @@ class InputAdapter(nn.Module):
         # print(f"InputAdapter init: in_channels={in_channels}, hidden_channels={hidden_channels}, out_channels={out_channels}, residual_scale={residual_scale}")
         self.residual_scale = residual_scale
         self.network = nn.Sequential(
-            # nn.Conv2d(in_channels, hidden_channels, kernel_size=3, padding=1),
-            # nn.ReLU(inplace=True),
-            # nn.Conv2d(hidden_channels, out_channels, kernel_size=3, padding=1),
-            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels, hidden_channels, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(hidden_channels, out_channels, kernel_size=3, padding=1),
+            # nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
         )
         nn.init.zeros_(self.network[-1].weight)
         nn.init.zeros_(self.network[-1].bias)

@@ -9,7 +9,7 @@
 
 ## Commands
 
-- Train sam in floor\sam2 `python training/train.py -c configs/sam2.1_training/sam2.1_hiera_b+_floorplan_finetune.yaml  --use-cluster 0 --num-gpus 1`
+- Train sam in floor\sam2 `python training/train.py -c configs/sam2.1_training/sam2.1_hiera_b+_synthetic_finetune.yaml  --use-cluster 0 --num-gpus 1`
   - View tensorboard `tensorboard --bind_all --logdir ./sam2_logs/`
 
 ## Stuff
